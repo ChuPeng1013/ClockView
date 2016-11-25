@@ -140,13 +140,14 @@ public class ClockView extends View
         }
         //绘制时针
         hourPaint = new Paint();
-        numberPaint.setStrokeWidth(8);
-        numberPaint.setAntiAlias(true);
-        numberPaint.setColor(Color.GREEN);
-        numberPaint.setStyle(Paint.Style.FILL);
+        hourPaint.setStrokeWidth(8);
+        hourPaint.setAntiAlias(true);
+        hourPaint.setColor(Color.GREEN);
+        hourPaint.setStyle(Paint.Style.FILL);
         hourReverseLength = radius/8;
-        hourLength = radius /4;
-        canvas.drawLine(centerX, centerY + hourReverseLength, centerX, centerY - hourLength, numberPaint);
+        hourLength = 2*radius/5;
+        canvas.save();
+        canvas.drawLine(centerX, centerY + hourReverseLength, centerX, centerY - hourLength, hourPaint);
         //绘制分针
         minutePaint = new Paint();
         minutePaint.setStrokeWidth(6);
@@ -154,7 +155,20 @@ public class ClockView extends View
         minutePaint.setColor(Color.RED);
         minutePaint.setStyle(Paint.Style.FILL);
         minuteReverseLength = radius/6;
-        //minuteLength =
+        minuteLength = 3*radius/5;
+        canvas.rotate(60, centerX, centerY);
+        canvas.drawLine(centerX, centerY + minuteReverseLength, centerX, centerY - minuteLength, minutePaint);
+        //绘制秒针
+        secondPaint = new Paint();
+        secondPaint.setStrokeWidth(4);
+        secondPaint.setAntiAlias(true);
+        secondPaint.setColor(Color.BLACK);
+        secondPaint.setStyle(Paint.Style.FILL);
+        secondReverseLength = radius/4;
+        secondLength = 4*radius/5;
+        canvas.restore();
+        canvas.rotate(90, centerX, centerY);
+        canvas.drawLine(centerX, centerY + secondReverseLength, centerX, centerY - secondLength, secondPaint);
         //绘制圆心
         centerPaint = new Paint();
         centerPaint.setStrokeWidth(20);
