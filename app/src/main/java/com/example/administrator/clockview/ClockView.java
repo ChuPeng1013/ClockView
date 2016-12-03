@@ -7,10 +7,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-
+import java.util.Calendar;
+import java.util.Date;
 /**
  * Created by ChuPeng on 2016/10/28.
  */
@@ -38,6 +42,10 @@ public class ClockView extends View
     private int secondReverseLength;//秒针反向超过圆点的长度
     private static final float DEFAULT_LONG_DEGREE_LENGTH = 40f;//长刻度线
     private static final float DEFAULT_SHORT_DEGREE_LENGTH = 30f;//短刻度线
+    private int hour = 7;//初始化小时
+    private int minute = 30;//初始化分钟
+    private int second = 45;//初始化秒
+
     public ClockView(Context context)
     {
         super(context);
@@ -59,7 +67,71 @@ public class ClockView extends View
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    protected void onDraw(Canvas canvas)
+    private void drawHour(Canvas canvas, int hourTime, int minuteTime)
+    {
+        //绘制时针
+        hourPaint = new Paint();
+        hourPaint.setStrokeWidth(8);
+        hourPaint.setAntiAlias(true);
+        hourPaint.setColor(Color.GREEN);
+        hourPaint.setStyle(Paint.Style.FILL);
+        hourReverseLength = radius/8;
+        hourLength = 2*radius/5;
+        float hourDegrees = hourTime * 30 + (minuteTime/60f)*30;
+        canvas.rotate(hourDegrees, centerX, centerY);
+        canvas.drawLine(centerX, centerY + hourReverseLength, centerX, centerY - hourLength, hourPaint);
+    }
+
+    private void drawMinute(Canvas canvas, int minuteTime)
+    {
+        //绘制分针
+        minutePaint = new Paint();
+        minutePaint.setStrokeWidth(6);
+        minutePaint.setAntiAlias(true);
+        minutePaint.setColor(Color.RED);
+        minutePaint.setStyle(Paint.Style.FILL);
+        minuteReverseLength = radius/6;
+        minuteLength = 3*radius/5;
+        canvas.restore();
+        canvas.rotate(minuteTime * 6, centerX, centerY);
+        canvas.drawLine(centerX, centerY + minuteReverseLength, centerX, centerY - minuteLength, minutePaint);
+    }
+
+    private void drawSecond(Canvas canvas, int secondTime)
+    {
+        //绘制秒针
+        secondPaint = new Paint();
+        secondPaint.setStrokeWidth(4);
+        secondPaint.setAntiAlias(true);
+        secondPaint.setColor(Color.BLACK);
+        secondPaint.setStyle(Paint.Style.FILL);
+        secondReverseLength = radius/4;
+        secondLength = 4*radius/5;
+        canvas.restore();
+        canvas.rotate(secondTime * 6, centerX, centerY);
+        canvas.drawLine(centerX, centerY + secondReverseLength, centerX, centerY - secondLength, secondPaint);
+    }
+
+    private Handler handler = new Handler()
+    {
+        public void handleMessage(Message msg)
+        {
+            super.handleMessage(msg);
+            if(msg.what == 1234)
+            {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(new Date());
+                hour = calendar.get(Calendar.HOUR) + 1;
+                minute = calendar.get(Calendar.MINUTE);
+                second = calendar.get(Calendar.SECOND);
+                Log.d("time", hour + ":" + minute + ":" + second);
+                invalidate();
+            }
+
+        }
+    };
+
+    protected void onDraw(final Canvas canvas)
     {
         super.onDraw(canvas);
         //获取屏幕窗口
@@ -138,44 +210,18 @@ public class ClockView extends View
                 canvas.drawText(String.valueOf(i), centerX + a, centerY - b + textSize / 3, numberPaint);
             }
         }
-        //绘制时针
-        hourPaint = new Paint();
-        hourPaint.setStrokeWidth(8);
-        hourPaint.setAntiAlias(true);
-        hourPaint.setColor(Color.GREEN);
-        hourPaint.setStyle(Paint.Style.FILL);
-        hourReverseLength = radius/8;
-        hourLength = 2*radius/5;
         canvas.save();
-        canvas.drawLine(centerX, centerY + hourReverseLength, centerX, centerY - hourLength, hourPaint);
-        //绘制分针
-        minutePaint = new Paint();
-        minutePaint.setStrokeWidth(6);
-        minutePaint.setAntiAlias(true);
-        minutePaint.setColor(Color.RED);
-        minutePaint.setStyle(Paint.Style.FILL);
-        minuteReverseLength = radius/6;
-        minuteLength = 3*radius/5;
-        canvas.rotate(60, centerX, centerY);
-        canvas.drawLine(centerX, centerY + minuteReverseLength, centerX, centerY - minuteLength, minutePaint);
-        //绘制秒针
-        secondPaint = new Paint();
-        secondPaint.setStrokeWidth(4);
-        secondPaint.setAntiAlias(true);
-        secondPaint.setColor(Color.BLACK);
-        secondPaint.setStyle(Paint.Style.FILL);
-        secondReverseLength = radius/4;
-        secondLength = 4*radius/5;
-        canvas.restore();
-        canvas.rotate(90, centerX, centerY);
-        canvas.drawLine(centerX, centerY + secondReverseLength, centerX, centerY - secondLength, secondPaint);
+        //绘制指针
+        drawHour(canvas, hour, minute);
+        drawMinute(canvas, minute);
+        drawSecond(canvas, second);
         //绘制圆心
         centerPaint = new Paint();
         centerPaint.setStrokeWidth(20);
         centerPaint.setAntiAlias(true);
         centerPaint.setColor(Color.BLACK);
         centerPaint.setStyle(Paint.Style.FILL);
-        canvas.drawCircle(centerX, centerY, 7, centerPaint);
-
+        canvas.drawCircle(centerX, centerY, 10, centerPaint);
+        handler.sendEmptyMessageDelayed(1234, 1000);
     }
 }
