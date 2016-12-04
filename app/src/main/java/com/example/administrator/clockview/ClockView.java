@@ -121,7 +121,7 @@ public class ClockView extends View
             {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(new Date());
-                hour = calendar.get(Calendar.HOUR) + 1;
+                hour = calendar.get(Calendar.HOUR);
                 minute = calendar.get(Calendar.MINUTE);
                 second = calendar.get(Calendar.SECOND);
                 Log.d("time", hour + ":" + minute + ":" + second);
