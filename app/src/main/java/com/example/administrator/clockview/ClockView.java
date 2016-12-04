@@ -131,15 +131,54 @@ public class ClockView extends View
         }
     };
 
-    protected void onDraw(final Canvas canvas)
+    //设置控件的尺寸
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
-        super.onDraw(canvas);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         //获取屏幕窗口
         WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
         //获取当前屏幕的宽
         width = windowManager.getDefaultDisplay().getWidth();
         //获取当前屏幕的高
         height = windowManager.getDefaultDisplay().getHeight();
+        setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
+    }
+
+    //设置控件的宽
+    private int measureWidth(int widthMeasureSpec)
+    {
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        if(widthMode == MeasureSpec.EXACTLY)
+        {
+            width = widthSize;
+        }
+        else if(widthMode == MeasureSpec.AT_MOST)
+        {
+            width = Math.min(width, widthSize);
+        }
+        return width;
+    }
+
+    //设置控件的高
+    private int measureHeight(int heightMeasureSpec)
+    {
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        if(heightMode == MeasureSpec.EXACTLY)
+        {
+            height = heightSize;
+        }
+        else if(heightMode == MeasureSpec.AT_MOST)
+        {
+            height = Math.min(height, heightSize);
+        }
+        return height;
+    }
+
+    protected void onDraw(final Canvas canvas)
+    {
+        super.onDraw(canvas);
         //获取状态栏的高度
         Rect statusBar = new Rect();
         getWindowVisibleDisplayFrame(statusBar);
