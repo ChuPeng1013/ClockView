@@ -176,7 +176,7 @@ public class ClockView extends View
         return height;
     }
 
-    protected void onDraw(final Canvas canvas)
+    protected void onDraw(Canvas canvas)
     {
         super.onDraw(canvas);
         //获取状态栏的高度
